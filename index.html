@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MindGraine — a low-glare migraine diary</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,600;1,500;1,600&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="app-shell">
+
+  <!-- ===================== AUTH SCREEN ===================== -->
+  <div id="auth-screen" class="auth-wrap">
+    <div class="auth-card">
+      <div class="auth-hero">
+        <span class="brand-mark">MindGraine</span>
+        <p>Mind your migraine.</p>
+      </div>
+
+      <div id="auth-error" class="auth-error hidden"></div>
+      <div id="auth-success" class="auth-success hidden"></div>
+
+      <form id="login-form">
+        <div class="field">
+          <label for="login-email">Email</label>
+          <input type="email" id="login-email" required autocomplete="email">
+        </div>
+        <div class="field">
+          <label for="login-password">Password</label>
+          <input type="password" id="login-password" required autocomplete="current-password">
+        </div>
+        <div class="forgot-pw-row">
+          <button type="button" id="forgot-password-btn" class="link-btn">Forgot password?</button>
+        </div>
+        <button type="submit" class="btn btn-primary auth-submit">Sign in</button>
+      </form>
+
+      <form id="signup-form" class="hidden">
+        <div class="field">
+          <label for="signup-name">Your name</label>
+          <input type="text" id="signup-name" required autocomplete="name" placeholder="What should we call you?">
+        </div>
+        <div class="field">
+          <label for="signup-email">Email</label>
+          <input type="email" id="signup-email" required autocomplete="email">
+        </div>
+        <div class="field">
+          <label for="signup-password">Password</label>
+          <input type="password" id="signup-password" required autocomplete="new-password" minlength="6">
+        </div>
+        <button type="submit" class="btn btn-primary auth-submit">Create account</button>
+      </form>
+
+      <div class="auth-switch">
+        <span id="switch-to-signup-wrap">New here? <button type="button" id="switch-to-signup">Create an account</button></span>
+        <span id="switch-to-login-wrap" class="hidden">Already have an account? <button type="button" id="switch-to-login">Sign in</button></span>
+      </div>
+
+      <div class="auth-divider"><span>or</span></div>
+
+      <button type="button" id="google-signin-btn" class="btn google-btn">
+        <svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true">
+          <path fill="#4285F4" d="M17.64 9.2c0-.64-.06-1.25-.16-1.84H9v3.48h4.84a4.14 4.14 0 0 1-1.8 2.72v2.26h2.9c1.7-1.57 2.7-3.88 2.7-6.62z"/>
+          <path fill="#34A853" d="M9 18c2.43 0 4.47-.8 5.96-2.18l-2.9-2.26c-.8.54-1.84.86-3.06.86-2.35 0-4.34-1.59-5.05-3.72H.98v2.33A9 9 0 0 0 9 18z"/>
+          <path fill="#FBBC05" d="M3.95 10.7A5.4 5.4 0 0 1 3.67 9c0-.59.1-1.17.28-1.7V4.97H.98A9 9 0 0 0 0 9c0 1.45.35 2.83.98 4.03l2.97-2.33z"/>
+          <path fill="#EA4335" d="M9 3.58c1.32 0 2.51.46 3.44 1.35l2.58-2.58C13.46.89 11.43 0 9 0A9 9 0 0 0 .98 4.97l2.97 2.33C4.66 5.17 6.65 3.58 9 3.58z"/>
+        </svg>
+        Continue with Google
+      </button>
+    </div>
+  </div>
+
+  <!-- ===================== DASHBOARD ===================== -->
+  <div id="app-screen" class="hidden">
+
+    <div class="topbar">
+      <div class="brand">
+        <span class="brand-mark">MindGraine</span>
+        <span class="brand-tag">Mind your migraine</span>
+      </div>
+      <div class="topbar-right">
+        <nav class="view-nav">
+          <button type="button" class="view-nav-btn active" data-view="dashboard">Dashboard</button>
+          <button type="button" class="view-nav-btn" data-view="tips">Tips</button>
+        </nav>
+        <div class="user-menu">
+          <button id="user-menu-btn" class="avatar-btn" title="Account">
+            <span id="avatar-initial">?</span>
+          </button>
+          <div id="user-menu-dropdown" class="user-dropdown hidden">
+            <p id="user-email" class="user-dropdown-email"></p>
+            <div class="user-dropdown-divider"></div>
+            <button id="edit-name-btn" class="user-dropdown-item">Edit name</button>
+            <button id="signout-btn" class="user-dropdown-item user-dropdown-item-danger">Sign out</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Full greeting, shown with room to breathe under the topbar -->
+    <p id="greeting-line" class="greeting-line"></p>
+
+    <!-- ================= DASHBOARD VIEW ================= -->
+    <div id="dashboard-view">
+
+    <!-- Stats -->
+    <div class="stats-row" id="stats-row">
+      <div class="stat"><div class="stat-value" id="stat-total">—</div><div class="stat-label">Episodes logged</div></div>
+      <div class="stat"><div class="stat-value" id="stat-avg-pain">—</div><div class="stat-label">Average pain</div></div>
+      <div class="stat"><div class="stat-value" id="stat-this-month">—</div><div class="stat-label">Last 30 days</div></div>
+      <div class="stat"><div class="stat-value" id="stat-top-trigger">—</div><div class="stat-label">Top trigger</div></div>
+    </div>
+
+    <div class="dash-grid">
+      <!-- Night sky diary -->
+      <div class="card">
+        <div class="sky-header">
+          <div>
+            <p class="card-title" id="sky-title">This month</p>
+            <p class="card-sub">Sky diary — brighter dot, higher pain</p>
+          </div>
+          <select id="sky-month-select" class="month-select"></select>
+        </div>
+        <div class="sky-wrap">
+          <div class="sky-weekdays">
+            <span>S</span><span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span>
+          </div>
+          <div class="sky-grid" id="sky-grid"></div>
+          <div class="sky-legend">
+            <span class="sky-legend-dot"><span class="sky-legend-swatch" style="background:#4A4560;"></span>no entry</span>
+            <span class="sky-legend-dot"><span class="sky-legend-swatch" style="background:#8FA888;"></span>mild</span>
+            <span class="sky-legend-dot"><span class="sky-legend-swatch" style="background:#D3A64F;"></span>moderate</span>
+            <span class="sky-legend-dot"><span class="sky-legend-swatch" style="background:#C1666B;"></span>severe</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Triggers -->
+      <div class="card">
+        <p class="card-title">Possible triggers</p>
+        <p class="card-sub">How often each has shown up</p>
+        <div class="trigger-list" id="trigger-list">
+          <div class="empty-state"><div class="em-sub">Log a few episodes to see patterns here.</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Trend chart -->
+    <div class="card chart-card">
+      <div class="chart-card-header">
+        <div>
+          <p class="card-title">Migraine frequency</p>
+          <p class="card-sub" id="chart-sub">Episodes per month</p>
+        </div>
+        <div class="chart-toggle" id="chart-toggle">
+          <button type="button" class="toggle-btn active" data-view="month">Month</button>
+          <button type="button" class="toggle-btn" data-view="year">Year</button>
+        </div>
+      </div>
+      <div class="chart-wrap">
+        <canvas id="trend-chart"></canvas>
+      </div>
+    </div>
+
+    <!-- Log form -->
+    <div class="card log-form-card" id="log-form-card">
+      <p class="card-title" id="log-form-title">Log a migraine</p>
+      <p class="card-sub" id="log-form-sub">Fill in what you can — nothing here is required except the date</p>
+      <form id="entry-form">
+        <div class="form-grid">
+          <div class="field">
+            <label for="entry-date">Date</label>
+            <input type="date" id="entry-date" required>
+          </div>
+          <div class="field">
+            <label for="entry-start">Start time</label>
+            <input type="time" id="entry-start">
+          </div>
+          <div class="field">
+            <label for="entry-duration">Duration (hours)</label>
+            <input type="number" id="entry-duration" min="0" step="0.5" placeholder="e.g. 4">
+          </div>
+
+          <div class="field full">
+            <label>Pain level</label>
+            <div class="pain-scale" id="pain-scale"></div>
+          </div>
+
+          <div class="field full">
+            <label>Symptoms</label>
+            <div class="chip-group" id="symptom-chips"></div>
+            <input type="text" id="entry-custom-symptoms" class="custom-tag-input" placeholder="Other symptoms — separate with commas (e.g. jaw pain, blurry vision)">
+          </div>
+
+          <div class="field full">
+            <label>Possible triggers</label>
+            <div class="chip-group" id="trigger-chips"></div>
+          </div>
+
+          <div class="field">
+            <label for="entry-sleep">Hours of sleep</label>
+            <input type="number" id="entry-sleep" min="0" max="24" step="0.5" placeholder="e.g. 6.5">
+          </div>
+          <div class="field">
+            <label for="entry-stress">Stress (1–5)</label>
+            <select id="entry-stress">
+              <option value="">—</option>
+              <option value="1">1 · low</option>
+              <option value="2">2</option>
+              <option value="3">3</option>
+              <option value="4">4</option>
+              <option value="5">5 · high</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="entry-relief">Relief used</label>
+            <input type="text" id="entry-relief" placeholder="e.g. Advil, dark room">
+          </div>
+
+          <div class="field full">
+            <label for="entry-notes">Notes</label>
+            <textarea id="entry-notes" rows="2" placeholder="Anything else worth remembering"></textarea>
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button type="button" id="cancel-edit-btn" class="btn btn-ghost hidden">Cancel edit</button>
+          <button type="submit" class="btn btn-primary" id="save-entry-btn">Save entry</button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Entries list -->
+    <div class="card entries-card">
+      <div class="sky-header">
+        <div>
+          <p class="card-title">Recent episodes</p>
+          <p class="card-sub">Grouped by month, most recent first</p>
+        </div>
+        <select id="jump-to-month" class="month-select">
+          <option value="">Jump to month…</option>
+        </select>
+      </div>
+      <div id="entries-list">
+        <div class="loading-line">Loading your entries…</div>
+      </div>
+    </div>
+
+    </div>
+    <!-- ================= END DASHBOARD VIEW ================= -->
+
+    <!-- ================= TIPS VIEW ================= -->
+    <div id="tips-view" class="hidden">
+      <div class="tips-intro">
+        <p class="card-title" style="font-size:22px;">Managing migraines day to day</p>
+        <p class="tips-disclaimer">General information, not medical advice — everyone's migraines are different, and a doctor who knows your history is always the best judge of what's right for you.</p>
+      </div>
+
+      <div class="tips-grid">
+        <div class="card tip-card">
+          <p class="tip-card-title">Sleep</p>
+          <p class="tip-card-body">Irregular sleep is one of the most commonly reported migraine triggers — both too little and too much.</p>
+          <ul class="tip-list">
+            <li>Keep roughly the same bed and wake time, even on weekends</li>
+            <li>Aim for a consistent 7–9 hours rather than "catching up" later</li>
+            <li>Notice if oversleeping on rest days tends to bring one on</li>
+          </ul>
+        </div>
+
+        <div class="card tip-card">
+          <p class="tip-card-title">Hydration &amp; food</p>
+          <p class="tip-card-body">Dehydration and skipped meals are frequent, easy-to-miss triggers.</p>
+          <ul class="tip-list">
+            <li>Sip water through the day rather than all at once</li>
+            <li>Try not to go long stretches without eating</li>
+            <li>Track specific foods in your log — common ones people report are aged cheese, alcohol, caffeine, and processed meats, but it's highly individual</li>
+          </ul>
+        </div>
+
+        <div class="card tip-card">
+          <p class="tip-card-title">Stress</p>
+          <p class="tip-card-body">Migraines can follow high-stress periods — or even show up right after stress lets up.</p>
+          <ul class="tip-list">
+            <li>Build small breaks into busy days rather than pushing straight through</li>
+            <li>Short breathing exercises or a brief walk can help in the moment</li>
+            <li>If weekends or vacations tend to trigger one, that's worth logging too</li>
+          </ul>
+        </div>
+
+        <div class="card tip-card">
+          <p class="tip-card-title">Screens &amp; light</p>
+          <p class="tip-card-body">Bright or flickering light and long screen sessions are common sensory triggers.</p>
+          <ul class="tip-list">
+            <li>Try the 20-20-20 rule: every 20 minutes, look at something 20 feet away for 20 seconds</li>
+            <li>Lower screen brightness or use a warmer color mode in the evening</li>
+            <li>Sunglasses or dimmer indoor lighting can help if you're light-sensitive</li>
+          </ul>
+        </div>
+
+        <div class="card tip-card">
+          <p class="tip-card-title">Weather &amp; hormones</p>
+          <p class="tip-card-body">Some people notice patterns tied to barometric pressure shifts or hormonal cycles.</p>
+          <ul class="tip-list">
+            <li>Log weather changes as a trigger if you suspect a connection</li>
+            <li>If you track your cycle, logging it alongside episodes can reveal a pattern over a few months</li>
+            <li>Patterns like these are often only visible after logging consistently — that's what this app is for</li>
+          </ul>
+        </div>
+
+        <div class="card tip-card">
+          <p class="tip-card-title">When to see a doctor</p>
+          <p class="tip-card-body">Your log is genuinely useful to bring to an appointment — it turns "I get headaches a lot" into an actual pattern.</p>
+          <ul class="tip-list">
+            <li>Migraines that are frequent (roughly 4+ days a month) or getting worse over time</li>
+            <li>Needing pain medication very often — overusing it can itself cause more headaches</li>
+            <li>A sudden, severe headache unlike your usual ones, or one with new neurological symptoms, needs urgent care, not a wait-and-see approach</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="card resources-card">
+        <p class="card-title">Further reading</p>
+        <p class="card-sub">A few reputable places to learn more</p>
+        <div class="resource-list">
+          <a class="resource-link" href="https://migrainecanada.org/understanding-migraine/what-causes-migraine/" target="_blank" rel="noopener">
+            <span class="resource-name">Migraine Canada — What Causes Migraine</span>
+            <span class="resource-domain">migrainecanada.org</span>
+          </a>
+          <a class="resource-link" href="https://americanmigrainefoundation.org/" target="_blank" rel="noopener">
+            <span class="resource-name">American Migraine Foundation — patient resources</span>
+            <span class="resource-domain">americanmigrainefoundation.org</span>
+          </a>
+          <a class="resource-link" href="https://www.who.int/news-room/fact-sheets/detail/headache-disorders" target="_blank" rel="noopener">
+            <span class="resource-name">World Health Organization — Headache Disorders fact sheet</span>
+            <span class="resource-domain">who.int</span>
+          </a>
+        </div>
+      </div>
+    </div>
+    <!-- ================= END TIPS VIEW ================= -->
+
+</div>
+
+</div>
+
+<!-- ===================== EDIT NAME MODAL ===================== -->
+<div id="edit-name-overlay" class="modal-overlay hidden">
+  <div class="modal-card">
+    <p class="card-title">Edit your name</p>
+    <p class="card-sub">This is what shows in your greeting up top</p>
+    <div id="edit-name-error" class="auth-error hidden"></div>
+    <form id="edit-name-form">
+      <div class="field">
+        <label for="edit-name-input">Your name</label>
+        <input type="text" id="edit-name-input" required autocomplete="name">
+      </div>
+      <div class="form-actions">
+        <button type="button" id="edit-name-cancel" class="btn btn-ghost">Cancel</button>
+        <button type="submit" class="btn btn-primary">Save</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div id="toast" class="toast"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+<script type="module" src="app.js"></script>
+</body>
+</html>
